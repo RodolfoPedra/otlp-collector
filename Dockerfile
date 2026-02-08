@@ -1,6 +1,8 @@
 # Define a imagem base
 FROM otel/opentelemetry-collector-contrib:0.144.0
 
+USER 0:0
+
 # Copia o arquivo de configuração local para dentro da imagem
 # Isso substitui a necessidade de um bind mount para o config.yaml
 COPY ./config.yaml /etc/otelcol-contrib/config.yaml
