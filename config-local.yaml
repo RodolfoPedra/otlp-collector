@@ -42,7 +42,7 @@ processors:
 
 exporters:
   otlp:
-    endpoint: "http://213.199.32.95:4317"
+    endpoint: "http://${SIGNOZ_HOST}:4317"
     tls:
       insecure: true
   debug:
