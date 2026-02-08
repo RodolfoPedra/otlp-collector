@@ -54,12 +54,12 @@ extensions:
 service:
   extensions: [health_check, pprof, zpages]
   pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
+    # traces:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [otlp]
     metrics:
-      receivers: [otlp, docker_stats]
+      receivers: [docker_stats]
       processors: [batch, resourcedetection/docker]
       exporters: [otlp]
     logs:
