@@ -1,0 +1,68 @@
+receivers:
+  docker_stats:
+    endpoint: unix:///var/run/docker.sock
+    metrics:
+      container.cpu.utilization:
+        enabled: true
+      container.memory.percent:
+        enabled: true
+      container.network.io.usage.rx_bytes:
+        enabled: true
+      container.network.io.usage.tx_bytes:
+        enabled: true
+      container.network.io.usage.rx_dropped:
+        enabled: true
+      container.network.io.usage.tx_dropped:
+        enabled: true
+      container.memory.usage.limit:
+        enabled: true
+      container.memory.usage.total:
+        enabled: true
+      container.blockio.io_service_bytes_recursive:
+        enabled: true
+  filelog:
+    include: [/var/lib/docker/containers/*/*-json.log]
+    poll_interval: 200ms
+    start_at: end
+    include_file_name: false
+    include_file_path: false
+
+processors:
+  batch:
+  transform:
+    error_mode: ignore
+    log_statements:
+      - context: log
+      - set(resource.attributes["service.name"], ParseJSON(log.body)["attrs"]["tag"])
+      - set(resource.attributes["deployment.environment"], "local")
+  resourcedetection/docker:
+    detectors: [env, docker]
+    timeout: 2s
+    override: false
+
+exporters:
+  otlp:
+    endpoint: "http://${SIGNOZ_HOST}:4317"
+    tls:
+      insecure: true
+
+extensions:
+  health_check:
+  pprof:
+  zpages:
+
+service:
+  extensions: [health_check, pprof, zpages]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp, docker_stats]
+      processors: [batch, resourcedetection/docker]
+      exporters: [otlp]
+    logs:
+      receivers: [filelog]
+      processors: [batch, transform]
+      exporters: [otlp]
