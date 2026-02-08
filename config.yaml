@@ -34,7 +34,7 @@ processors:
     log_statements:
       - context: log
       - set(resource.attributes["service.name"], ParseJSON(log.body)["attrs"]["tag"])
-      - set(resource.attributes["deployment.environment"], "local")
+      - set(resource.attributes["deployment.environment"], "dev")
   resourcedetection/docker:
     detectors: [env, docker]
     timeout: 2s
