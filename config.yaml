@@ -50,7 +50,8 @@ extensions:
   health_check:
   pprof:
   zpages:
-
+    endpoint: 0.0.0.0:55680 
+    
 service:
   extensions: [health_check, pprof, zpages]
   pipelines:
